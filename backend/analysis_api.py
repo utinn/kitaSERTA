@@ -160,6 +160,40 @@ def extract_candidates(result: dict) -> list[dict]:
 async def run_analysis(settings: AnalysisSettings):
     result = await execute_langflow(settings)
 
+    
+    nested = result["outputs"][0].get("outputs", [])
+
+    logger.warning(
+        "Nested output count: %s",
+        len(nested) if isinstance(nested, list) else "not a list",
+    )
+
+    if isinstance(nested, list):
+        for i, output in enumerate(nested):
+            if not isinstance(output, dict):
+                logger.warning("Output %s type: %s", i, type(output).__name__)
+                continue
+
+            results = output.get("results")
+
+            logger.warning(
+                "Output %s: keys=%s, results_type=%s, results_keys=%s",
+                i,
+                list(output.keys()),
+                type(results).__name__,
+                list(results.keys()) if isinstance(results, dict) else None,
+            )
+
+            if isinstance(results, dict):
+                message = results.get("message")
+
+                logger.warning(
+                    "Output %s message_type=%s, message_keys=%s",
+                    i,
+                    type(message).__name__,
+                    list(message.keys()) if isinstance(message, dict) else None,
+                )
+
     try:
         candidates = extract_candidates(result)
     except ValueError as exc:
