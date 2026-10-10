@@ -1,0 +1,79 @@
+
+# ==========================================
+# ENVIRONMENT VARIABLES & SECRETS
+# ==========================================
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Private keys and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials.json
+*service-account*.json
+secrets/
+credentials/
+
+# ==========================================
+# PYTHON / FASTAPI
+# ==========================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ==========================================
+# REACT / VITE / NODE
+# ==========================================
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# ==========================================
+# LOGS & TEMP FILES
+# ==========================================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# ==========================================
+# LOCAL DATABASES
+# ==========================================
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# ==========================================
+# EDITOR / OS
+# ==========================================
+.vscode/settings.local.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# ==========================================
+# LOCAL TEST OUTPUTS
+# ==========================================
+.pytest_cache/
+coverage/
+test-results/
+playwright-report/

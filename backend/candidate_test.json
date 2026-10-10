@@ -1,0 +1,66 @@
+{
+  "proposal_id": "proposal-github-pr-merge-notification",
+  "title": "Automated Pull Request Merge Notification and Downstream Sync",
+  "department": "Engineering",
+  "problem_summary": "Pull requests are merged across multiple GitHub repositories (backend, frontend, automation-engine) without automated downstream tracking or notifications linked to the merge event.",
+  "evidence_event_ids": [
+    "dashboard-9965ce09-e4fa-4acd-8c89-144cf8a82839",
+    "dashboard-20fcaa20-2ed2-4e7c-aca7-5dfafd6eaaea",
+    "dashboard-e2a39c9f-752e-412c-ac1c-3036bb9b4dd0",
+    "dashboard-b060c4c0-a107-4084-bc11-879eef772c9c",
+    "dashboard-0836f213-b0c3-4fa5-bbe8-3033ea2a63cf",
+    "dashboard-9692fc29-5997-4471-8c53-2391ef4e5036",
+    "dashboard-51675482-3c7b-485b-b7bf-e871052ebdae"
+  ],
+  "trigger": "GITHUB_PULL_REQUEST_MERGED",
+  "preconditions": [
+    "GitHub webhook configured for pull_request merged events",
+    "Target communication channel or tracking board integration available"
+  ],
+  "steps": [
+    {
+      "step_number": 1,
+      "action": "Capture pull_request_merged webhook payload from GitHub",
+      "tool": "github"
+    },
+    {
+      "step_number": 2,
+      "action": "Extract metadata including project repository, branch, and author",
+      "tool": "github"
+    },
+    {
+      "step_number": 3,
+      "action": "Post automated notification or update task status in project management/chat tool",
+      "tool": "github"
+    }
+  ],
+  "required_tools": [
+    "github"
+  ],
+  "expected_side_effects": [
+    "Sending notification messages to team channels upon merge"
+  ],
+  "sop_status": "missing",
+  "sop_constraints": {
+    "allowed_actors": [],
+    "required_fields": [],
+    "mandatory_sequence": [],
+    "approval_gates": [],
+    "timing_limits": [],
+    "prohibited_actions": [],
+    "retention_rules": [],
+    "escalation_conditions": []
+  },
+  "validation_result": "blocked",
+  "risk_level": "low",
+  "reversibility": "full",
+  "human_approval_required": true,
+  "auto_execute_allowed": false,
+  "expected_minutes_saved_per_run": 5,
+  "confidence": "high",
+  "rollback_plan": "Disable GitHub webhook integration and revert notification configurations in the target channels.",
+  "blocked_reasons": [
+    "No authoritative SOP provided for GitHub pull request merge notification and downstream sync."
+  ],
+  "approval_question": "Do you approve this automation proposal despite the missing SOP context?"
+}

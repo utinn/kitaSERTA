@@ -1,0 +1,78 @@
+
+.activity-logs {
+  background: #ffffff;
+  color: #171717;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.activity-logs__header h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.activity-logs__header p {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: #737373;
+}
+
+.activity-logs__table-wrapper {
+  overflow-x: auto;
+}
+
+.activity-logs__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.activity-logs__table th {
+  background: #fafafa;
+  padding: 14px 16px;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.activity-logs__table td {
+  padding: 16px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.activity-logs__table tbody tr:hover {
+  background: #fafafa;
+}
+
+.activity-logs__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.activity-logs__message {
+  color: #737373;
+  text-align: center;
+  padding: 32px;
+}
+
+.activity-logs__error {
+  padding: 14px;
+  border-radius: 8px;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+@media (max-width: 768px) {
+  .activity-logs {
+    padding: 16px;
+  }
+
+  .activity-logs__table {
+    min-width: 700px;
+  }
+}
