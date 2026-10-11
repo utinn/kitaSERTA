@@ -1,0 +1,157 @@
+{
+  "report_meta": {
+    "generated_by": "bob-automation-analyst",
+    "analysis_input_file": "bob_analysis_input.json",
+    "version": "2",
+    "supersedes": "bob_analysis_report.json",
+    "analysis_timestamp": "2026-10-09T11:00:00.000000+00:00",
+    "window_days": 7,
+    "min_occurrences_threshold": 3,
+    "group_by": ["tool", "action"],
+    "total_events_analyzed": 7,
+    "corrections_from_v1": [
+      "Repository count corrected: 4 distinct repositories (not 3). The statement '3 distinct repositories' in v1 was internally inconsistent — 4 projects were listed in the same sentence.",
+      "Actor count corrected: 5 distinct actor IDs total (dev-001, dev-002, dev-003, dev-004, react-e2e-001). v1 stated '4 distinct human employee IDs' — the 'human' qualifier for dev-001 through dev-004 is an unverified assumption moved to unverified_assumptions.",
+      "Ingestion latency range corrected: min ~0.84 s (dashboard-b060c4c0), max ~3.30 s (dashboard-20fcaa20). v1 stated '~1 s to ~3 s', which underreported the true minimum and maximum.",
+      "Time gap between react-e2e-001 merge and first subsequent merge corrected: ~41.2 minutes (not ~43 minutes). The ~43-minute figure was the full window span, not the actor-to-actor gap.",
+      "Candidate action A2 (Supabase activity log ingestion) removed: this capability is already implemented in Flow 1 and must not be proposed as a new automation.",
+      "SOP status downgraded from hard prerequisite blocking automation to a warning. Missing SOP documentation is a risk factor, not an automatic rejection condition.",
+      "Human approval scope updated: A2 removed; SOP sign-off removed as a hard gate; scope now covers repository allowlist, action selection (A1, A3), and actor-type classification for react-e2e-001."
+    ]
+  },
+  "patterns": [
+    {
+      "pattern_id": "PAT-001",
+      "pattern_key": "github:pull_request_merged",
+      "tool": "github",
+      "action": "pull_request_merged",
+      "occurrence_count": 7,
+      "qualifies_for_automation": true,
+      "evidence_event_ids": [
+        "dashboard-9965ce09-e4fa-4acd-8c89-144cf8a82839",
+        "dashboard-20fcaa20-2ed2-4e7c-aca7-5dfafd6eaaea",
+        "dashboard-e2a39c9f-752e-412c-ac1c-3036bb9b4dd0",
+        "dashboard-b060c4c0-a107-4084-bc11-879eef772c9c",
+        "dashboard-0836f213-b0c3-4fa5-bbe8-3033ea2a63cf",
+        "dashboard-9692fc29-5997-4471-8c53-2391ef4e5036",
+        "dashboard-51675482-3c7b-485b-b7bf-e871052ebdae"
+      ],
+      "observed_facts": [
+        "7 pull_request_merged events were recorded on 2026-10-09, spanning a total window of ~42.9 minutes (earliest: 09:56:49 UTC, latest: 10:39:44 UTC), exceeding the min_occurrences threshold of 3.",
+        "Events span 4 distinct repositories: oneforall/frontend (2 events, actor dev-002), oneforall/backend (2 events, actor dev-001), oneforall/automation-engine (2 events, actors dev-003 and dev-004), and team/one-for-all (1 event, actor react-e2e-001).",
+        "5 distinct actor IDs appear in the dataset: dev-001, dev-002, dev-003, dev-004, and react-e2e-001.",
+        "PR object titles indicate cross-functional delivery activity: UI components ('Merge activity logs table UI', 'Merge responsive dashboard layout'), backend modules ('Merge user authentication module', 'Merge Supabase activity logging integration'), automation-engine components ('Merge workflow event normalizer', 'Merge approval workflow components'), and end-to-end testing ('E2E Testing from React Dashboard').",
+        "All 7 events share trigger_slug GITHUB_PULL_REQUEST_MERGED, normalization version 1.0, and an empty missing_fields array — no normalization gaps are present in the captured data.",
+        "Actor react-e2e-001 merged PR 'E2E Testing from React Dashboard' into project 'team/one-for-all' at 09:56:49 UTC. The next merge event occurred at 10:38:00 UTC (dev-001), a gap of ~41.2 minutes. The remaining 6 merges by dev-001 through dev-004 occurred in a tighter cluster of ~1.73 minutes (10:38:00–10:39:44 UTC).",
+        "Ingestion latency (created_at minus timestamp) per event: dashboard-9965ce09: 1.00 s; dashboard-20fcaa20: 3.30 s; dashboard-e2a39c9f: 1.02 s; dashboard-b060c4c0: 0.84 s; dashboard-0836f213: 1.02 s; dashboard-9692fc29: 1.73 s; dashboard-51675482: 2.00 s. Range: 0.84 s – 3.30 s. All are sub-4-second, consistent with near-real-time processing."
+      ],
+      "unverified_assumptions": [
+        "It is assumed but not confirmed that actor IDs dev-001 through dev-004 correspond to human developers. The event schema does not include an actor type field; this is inferred from their naming convention.",
+        "It is assumed but not confirmed that 'react-e2e-001' is an automated CI/E2E test actor rather than a human developer. The naming pattern and PR title ('E2E Testing from React Dashboard') are consistent with automation, but no actor type field exists in the schema to verify this.",
+        "It is assumed that the 7 events represent the complete set of PR merge activity within the window; additional merges not captured are possible if the pipeline filters or drops events before ingestion.",
+        "It is assumed that the repositories oneforall/frontend, oneforall/backend, oneforall/automation-engine, and team/one-for-all belong to a single team or organization — the data does not explicitly confirm organizational ownership.",
+        "It is assumed that no deployment pipeline is currently auto-triggered on merge for these repositories; no downstream tool events appear in the dataset to confirm or deny this.",
+        "Time savings estimates are not provided because no baseline manual effort data exists in the input."
+      ],
+      "proposed_automation": {
+        "trigger": "GITHUB_PULL_REQUEST_MERGED",
+        "description": "On every pull_request_merged event, automatically dispatch a configurable post-merge workflow. The scope of actions within that workflow must be verified and approved before activation. Activity log ingestion into Supabase is already handled by Flow 1 and is excluded from this proposal.",
+        "candidate_actions": [
+          {
+            "action_id": "A1",
+            "name": "Post-merge notification",
+            "description": "Send a structured merge notification (repository, PR title, actor ID, timestamp) to a designated team channel (e.g., Slack, Teams) so stakeholders are informed without polling GitHub.",
+            "confidence": "high",
+            "rationale": "All 7 events contain clean, complete data (no missing_fields). The pattern is consistent across all 4 repositories and all 5 actor IDs. A generic notification handler is directly applicable with no dependency on unconfirmed integrations.",
+            "prerequisite": "Confirm target notification channel and whether react-e2e-001 (potential bot actor) should be included or suppressed in notifications."
+          },
+          {
+            "action_id": "A3",
+            "name": "Deployment pipeline trigger",
+            "description": "Trigger a branch-specific deployment pipeline when a PR is merged into a protected branch.",
+            "confidence": "low",
+            "rationale": "No CI/CD pipeline configuration or deployment tool events are present in the dataset. This action requires explicit confirmation that a target pipeline exists and is not already triggered by existing GitHub branch protection or Actions configuration.",
+            "prerequisite": "Confirm pipeline existence, target branches, and that no duplicate trigger would result from existing GitHub Actions workflows."
+          }
+        ],
+        "excluded_actions": [
+          {
+            "action_id": "A2",
+            "name": "Activity log ingestion (Supabase)",
+            "exclusion_reason": "Already implemented in Flow 1. Proposing this as a new automation would create a duplicate integration. No action required."
+          }
+        ],
+        "suggested_trigger_filter": "Apply automation to events where trigger_slug == 'GITHUB_PULL_REQUEST_MERGED' and missing_fields is empty. Scope per repository via an allowlist. Determine handling for actor react-e2e-001 before enabling notification actions."
+      },
+      "sop_status": {
+        "sop_exists": false,
+        "evidence": "No SOP reference, runbook link, or process documentation field was found in the input data. Events contain only normalization metadata.",
+        "classification": "warning",
+        "note": "Absence of a documented SOP is a risk factor and is recorded as a warning. It does not constitute an automatic rejection of the automation proposal. It is recommended — but not mandated — that a lightweight SOP be authored before production activation."
+      },
+      "risks": [
+        {
+          "risk_id": "R1",
+          "severity": "medium",
+          "description": "Automated post-merge actions triggered without repository-level scoping could inadvertently act on repositories that have different release processes or are not ready for automation.",
+          "mitigation": "Scope automation triggers to specific repositories or branches via an allowlist before enabling broadly."
+        },
+        {
+          "risk_id": "R2",
+          "severity": "medium",
+          "description": "Actor react-e2e-001 does not follow the dev-NNN naming convention used by the other 4 actors, and its actor type is unverified. If post-merge automation does not distinguish this actor, it may create feedback loops (e.g., a bot merge triggering a notification that triggers another automated action) or pollute employee attribution metrics.",
+          "mitigation": "Classify actor react-e2e-001 explicitly (human or bot) in the automation configuration and apply appropriate filtering per action type before activation."
+        },
+        {
+          "risk_id": "R3",
+          "severity": "low",
+          "description": "6 of the 7 merges occurred within a ~1.73-minute burst. If automation actions are not idempotent, a similar burst could cause duplicate notifications or pipeline queue saturation.",
+          "mitigation": "Ensure all downstream actions are idempotent and implement deduplication keyed on source_event_id."
+        },
+        {
+          "risk_id": "R4",
+          "severity": "low",
+          "description": "All 7 events fall within a single day, which is a narrow sample within the 7-day configured window. The observed burst pattern may not reflect typical merge frequency, which could affect throttle thresholds and notification fatigue planning.",
+          "mitigation": "Collect a full 7-day dataset before finalizing throttle and notification frequency parameters."
+        }
+      ],
+      "warnings": [
+        {
+          "warning_id": "W1",
+          "message": "The dataset contains only 1 qualified pattern across 7 total events, all from a single tool (GitHub) and single action type. No multi-tool or cross-tool workflow patterns can be identified from this input alone."
+        },
+        {
+          "warning_id": "W2",
+          "message": "Actor react-e2e-001 does not follow the human employee ID convention (dev-NNN). Its actor type is not declared in the event schema. Any automation relying on employee attribution must handle this case explicitly to avoid incorrect audit trail entries."
+        },
+        {
+          "warning_id": "W3",
+          "message": "No downstream events (e.g., deployments, test runs, notifications other than what Flow 1 handles) appear in the dataset after the merges. Their existence elsewhere cannot be determined from this input file alone."
+        },
+        {
+          "warning_id": "W4",
+          "message": "No SOP or runbook was found in the input data. This is noted as a process risk but does not block the automation proposal. A lightweight SOP is recommended before production activation."
+        }
+      ],
+      "human_approval_recommendation": {
+        "approval_required": true,
+        "recommendation": "Human approval and verified action configuration are required before any proposed automation is activated. Specifically: (1) A responsible owner must confirm the repository and branch allowlist for automation scope. (2) The team must decide which candidate actions (A1, A3) are in scope and in what order. (3) Actor react-e2e-001 must be explicitly classified (human or bot) and its handling encoded in the automation filter logic prior to activation. These three items must be resolved. SOP documentation is recommended but not a hard gate.",
+        "approval_scope": [
+          "repository and branch allowlist",
+          "action selection (A1 and/or A3)",
+          "actor-type classification for react-e2e-001"
+        ],
+        "recommended_but_not_blocking": [
+          "lightweight SOP documentation before production activation"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "total_qualified_patterns": 1,
+    "patterns_with_automation_opportunity": 1,
+    "patterns_requiring_human_approval": 1,
+    "overall_automation_readiness": "conditional",
+    "overall_automation_readiness_note": "Data quality is high: all 7 events are fully normalized (no missing_fields), ingestion latency is 0.84–3.30 s, and the trigger_slug is consistent. The pattern clearly qualifies. Automation is feasible but must not be activated until repository scoping, actor classification for react-e2e-001, and action selection are confirmed by a responsible owner. Supabase activity logging is already handled by Flow 1 and requires no further action."
+  }
+}

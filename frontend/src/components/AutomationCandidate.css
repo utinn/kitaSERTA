@@ -343,9 +343,36 @@
   white-space: nowrap;
 }
 
+/* Automation setup (Execution audit) */
+.automation-setup {
+  padding: var(--space-5) var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.automation-setup .form {
+  padding: 0;
+  margin-top: var(--space-4);
+}
+
+.automation-setup-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.automation-setup-result {
+  margin-top: var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.automation-setup-actions {
+  margin-top: var(--space-5);
+}
+
 @media (max-width: 720px) {
   .review-steps,
-  .detection-fields {
+  .detection-fields,
+  .automation-setup-fields {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -368,6 +395,7 @@
   .candidate-review-note,
   .candidate-confirm,
   .candidate-details,
+  .automation-setup,
   .candidate-footer {
     padding-left: var(--space-4);
     padding-right: var(--space-4);

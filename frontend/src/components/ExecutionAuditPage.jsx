@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import Icon from "./Icon.jsx";
+import AutomationSetup from "./AutomationSetup.jsx";
 import { DetectionBadges, StatusPill } from "./CandidateCard.jsx";
 import { fetchCandidates } from "../api/candidates.js";
 import { asArray, humanize, normalizeStep } from "../utils/candidateFormat.js";
+import { isSupportedAutomation } from "../utils/automationSetup.js";
 import "./AutomationCandidate.css";
 
-// Execution (Flow 3) is not implemented: approved proposals only wait here.
-const EXECUTION_STATUS = "Awaiting execution";
+// Accept means approval, not activation. Setup is not persisted and no
+// activation endpoint exists yet, so a supported proposal always needs setup.
+const SETUP_REQUIRED = "Setup required";
+const UNSUPPORTED = "Not supported yet";
 
 const ONE_TIME_PATTERN = /one[-_ ]?time|once|single[-_ ]?run|manual/i;
 
@@ -51,6 +55,7 @@ function AuditCard({ candidate }) {
   const isBlocked = validationResult === "blocked";
   const oneTime = isOneTime(proposal);
   const lifecycleAction = oneTime ? "Archive" : "Disable";
+  const supported = isSupportedAutomation(proposal);
 
   return (
     <article className="card candidate-card">
@@ -76,7 +81,7 @@ function AuditCard({ candidate }) {
         <div>
           <dt>Execution status</dt>
           <dd>
-            <span className="status-pill">{EXECUTION_STATUS}</span>
+            <span className="status-pill">{supported ? SETUP_REQUIRED : UNSUPPORTED}</span>
           </dd>
         </div>
         <div>
@@ -137,9 +142,18 @@ function AuditCard({ candidate }) {
         </div>
       </div>
 
+      {supported ? (
+        <AutomationSetup proposalId={candidate.proposal_id} />
+      ) : (
+        <p className="candidate-review-note" role="note">
+          Only GitHub pull request merged → Slack notification automations can
+          be set up in this version.
+        </p>
+      )}
+
       <div className="candidate-footer">
         <span className="candidate-muted">
-          Approved by human review. Not executed — execution is not enabled yet.
+          Approved by human review. Not active — activation is not available yet.
         </span>
         <button
           type="button"
