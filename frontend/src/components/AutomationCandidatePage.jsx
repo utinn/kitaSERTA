@@ -5,7 +5,6 @@ import Icon from "./Icon.jsx";
 import { fetchCandidates } from "../api/candidates.js";
 import "./AutomationCandidate.css";
 
-// This page is the review queue: decided proposals move to Execution Audit.
 const REVIEW_STATUS = "pending_review";
 
 const REVIEW_STEPS = [
@@ -35,7 +34,6 @@ export default function AutomationCandidatePage() {
   const [notice, setNotice] = useState(null);
   const refreshController = useRef(null);
 
-  // Abort any in-flight background refresh on unmount.
   useEffect(() => () => refreshController.current?.abort(), []);
 
   useEffect(() => {
@@ -69,8 +67,6 @@ export default function AutomationCandidatePage() {
     setReloadKey((key) => key + 1);
   }, []);
 
-  // Re-fetch the pending queue in the background, keeping the current list
-  // on failure; a later visit re-fetches it.
   const refreshCandidates = useCallback(() => {
     refreshController.current?.abort();
     const controller = new AbortController();
@@ -88,8 +84,6 @@ export default function AutomationCandidatePage() {
       .catch(() => {});
   }, []);
 
-  // Called by a card after the decision API confirmed the save. The decided
-  // proposal leaves the review queue; approved ones appear in Execution Audit.
   const handleDecisionSaved = useCallback(
     (candidate, result) => {
       const title = candidate.title ?? candidate.proposal_id;

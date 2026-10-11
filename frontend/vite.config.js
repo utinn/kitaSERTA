@@ -3,8 +3,6 @@ import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig(({ mode }) => {
-  // Read server-only credentials from the existing backend/.env.
-  // These values are NOT exposed to browser code.
   const backendEnvDir = fileURLToPath(
     new URL("../backend/", import.meta.url)
   );
@@ -32,7 +30,6 @@ export default defineConfig(({ mode }) => {
       host: "127.0.0.1",
 
       proxy: {
-        // Analysis needs no credentials; never attach tokens here.
         "/api/analysis": {
           target: "http://127.0.0.1:8000",
           changeOrigin: true,
@@ -47,10 +44,15 @@ export default defineConfig(({ mode }) => {
             proxy.on("proxyReq", (proxyReq, req) => {
               const pathname = (req.url ?? "").split("?")[0];
 
-              // Existing GET access for listing candidates.
+              const isConfigPath =
+                /^\/api\/candidates\/[^/]+\/automation-config$/.test(pathname);
+
+              const isHistoryPath =
+                /^\/api\/candidates\/[^/]+\/executions$/.test(pathname);
+
               if (
                 req.method === "GET" &&
-                pathname === "/api/candidates"
+                (pathname === "/api/candidates" || isConfigPath || isHistoryPath)
               ) {
                 proxyReq.setHeader(
                   "X-Ingest-Token",
@@ -58,12 +60,15 @@ export default defineConfig(({ mode }) => {
                 );
               }
 
-              // Development-only decision endpoint.
               const isDecisionRequest =
-                req.method === "PATCH" &&
-                /^\/api\/candidates\/[^/]+\/decision$/.test(pathname);
+                (req.method === "PATCH" &&
+                  /^\/api\/candidates\/[^/]+\/decision$/.test(pathname)) ||
+                (req.method === "PUT" && isConfigPath) ||
+                (req.method === "POST" &&
+                  /^\/api\/candidates\/[^/]+\/automation-config\/(verify|activate|disable)$/.test(pathname)) ||
+                (req.method === "POST" &&
+                  /^\/api\/candidates\/[^/]+\/resolve-destination$/.test(pathname));
 
-              // Only allow requests originating from our local Vite app.
               const allowedOrigins = new Set([
                 "http://127.0.0.1:5173",
                 "http://localhost:5173",

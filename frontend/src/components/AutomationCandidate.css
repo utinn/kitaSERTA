@@ -1,6 +1,3 @@
-/* ------------------------------------------------------------------
-   Automation Candidate page
-   ------------------------------------------------------------------ */
 .review-steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -48,7 +45,6 @@
   gap: var(--space-4);
 }
 
-/* Detection settings */
 .detection-settings {
   margin-bottom: var(--space-6);
 }
@@ -68,7 +64,6 @@
   background: var(--color-surface-muted);
 }
 
-/* Card */
 .candidate-heading {
   min-width: 0;
 }
@@ -343,7 +338,6 @@
   white-space: nowrap;
 }
 
-/* Automation setup (Execution audit) */
 .automation-setup {
   padding: var(--space-5) var(--space-6);
   border-top: 1px solid var(--color-border);
@@ -352,6 +346,25 @@
 .automation-setup .form {
   padding: 0;
   margin-top: var(--space-4);
+}
+
+.automation-setup-status {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.automation-setup-status div,
+.automation-setup-status dd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+}
+
+.automation-setup-status dt {
+  font-weight: 500;
 }
 
 .automation-setup-fields {
@@ -367,6 +380,55 @@
 
 .automation-setup-actions {
   margin-top: var(--space-5);
+}
+
+.execution-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.execution-history-note {
+  margin-top: var(--space-3);
+}
+
+.execution-records {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.execution-record {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-muted);
+  font-size: var(--text-sm);
+}
+
+.execution-record-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  flex-wrap: wrap;
+}
+
+.execution-event-id {
+  overflow-wrap: anywhere;
+}
+
+.execution-record-meta,
+.execution-record-summary,
+.execution-record-details {
+  margin-top: var(--space-2);
+}
+
+.execution-record-summary {
+  color: var(--color-text);
 }
 
 @media (max-width: 720px) {

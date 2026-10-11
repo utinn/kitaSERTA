@@ -1,12 +1,5 @@
-// Relative on purpose: the Vite dev proxy forwards this to FastAPI.
 export const ANALYSIS_ENDPOINT = "/api/analysis/run";
 
-/**
- * POST detection settings to run workflow analysis (Flow 2).
- * Resolves with { status, settings, candidates, persistence }.
- * Rejects with an Error whose message is the API's `detail` when available.
- * Running analysis only proposes candidates; it never executes automations.
- */
 export async function runAnalysis({ min_occurrences, window_days }) {
   let response;
 

@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import Icon from "./Icon.jsx";
 import AutomationSetup from "./AutomationSetup.jsx";
+import ExecutionHistory from "./ExecutionHistory.jsx";
 import { DetectionBadges, StatusPill } from "./CandidateCard.jsx";
 import { fetchCandidates } from "../api/candidates.js";
 import { asArray, humanize, normalizeStep } from "../utils/candidateFormat.js";
 import { isSupportedAutomation } from "../utils/automationSetup.js";
 import "./AutomationCandidate.css";
 
-// Accept means approval, not activation. Setup is not persisted and no
-// activation endpoint exists yet, so a supported proposal always needs setup.
 const SETUP_REQUIRED = "Setup required";
+const SOP_BLOCKED = "Blocked by SOP";
 const UNSUPPORTED = "Not supported yet";
+const OPERATIONAL_LABELS = {
+  active: { label: "Active", tone: " status-success" },
+  disabled: { label: "Disabled", tone: "" },
+};
 
 const ONE_TIME_PATTERN = /one[-_ ]?time|once|single[-_ ]?run|manual/i;
 
-// One-time automations are archived after they run; recurring (trigger-based)
-// ones are disabled. Proposals without a recurring trigger count as one-time.
 function isOneTime(proposal) {
   const mode =
     proposal.execution_mode ?? proposal.run_type ?? proposal.frequency ?? proposal.schedule;
@@ -55,7 +57,17 @@ function AuditCard({ candidate }) {
   const isBlocked = validationResult === "blocked";
   const oneTime = isOneTime(proposal);
   const lifecycleAction = oneTime ? "Archive" : "Disable";
-  const supported = isSupportedAutomation(proposal);
+  const supported = isSupportedAutomation(proposal, title);
+  const canSetUp = supported && !isBlocked;
+  const [operationalStatus, setOperationalStatus] = useState(null);
+  const confirmed = canSetUp ? OPERATIONAL_LABELS[operationalStatus] : undefined;
+  const executionStatus = confirmed
+    ? confirmed.label
+    : !supported
+      ? UNSUPPORTED
+      : isBlocked
+        ? SOP_BLOCKED
+        : SETUP_REQUIRED;
 
   return (
     <article className="card candidate-card">
@@ -81,7 +93,7 @@ function AuditCard({ candidate }) {
         <div>
           <dt>Execution status</dt>
           <dd>
-            <span className="status-pill">{supported ? SETUP_REQUIRED : UNSUPPORTED}</span>
+            <span className={`status-pill${confirmed?.tone ?? ""}`}>{executionStatus}</span>
           </dd>
         </div>
         <div>
@@ -142,31 +154,41 @@ function AuditCard({ candidate }) {
         </div>
       </div>
 
-      {supported ? (
-        <AutomationSetup proposalId={candidate.proposal_id} />
+      {canSetUp ? (
+        <AutomationSetup
+          proposalId={candidate.proposal_id}
+          onStatusChange={setOperationalStatus}
+        />
       ) : (
         <p className="candidate-review-note" role="note">
-          Only GitHub pull request merged → Slack notification automations can
-          be set up in this version.
+          {supported
+            ? "This proposal is blocked by SOP validation and cannot be set up."
+            : "Only GitHub pull request merged → Slack notification automations can be set up in this version."}
         </p>
       )}
 
+      {candidate.proposal_id && <ExecutionHistory proposalId={candidate.proposal_id} />}
+
       <div className="candidate-footer">
         <span className="candidate-muted">
-          Approved by human review. Not active — activation is not available yet.
+          {operationalStatus === "active" && canSetUp
+            ? "Approved by human review. Active for simulated events; see Execution history for runs."
+            : "Approved by human review. Not active."}
         </span>
-        <button
-          type="button"
-          className="button button-ghost"
-          disabled
-          title={`${lifecycleAction} becomes available after execution`}
-        >
-          {lifecycleAction}
-          <span className="visually-hidden">
-            {" "}
-            ({oneTime ? "one-time automation" : "recurring automation"}, available after execution)
-          </span>
-        </button>
+        {!canSetUp && (
+          <button
+            type="button"
+            className="button button-ghost"
+            disabled
+            title={`${lifecycleAction} becomes available after execution`}
+          >
+            {lifecycleAction}
+            <span className="visually-hidden">
+              {" "}
+              ({oneTime ? "one-time automation" : "recurring automation"}, available after execution)
+            </span>
+          </button>
+        )}
       </div>
     </article>
   );

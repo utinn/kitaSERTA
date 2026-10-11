@@ -21,7 +21,6 @@ router = APIRouter(prefix="/api/candidates", tags=["Automation Candidates"])
 
 
 class CandidateProposal(BaseModel):
-    # Preserve all additional fields from SOP Validator.
     model_config = ConfigDict(extra="allow")
 
     proposal_id: str = Field(min_length=1)
@@ -112,6 +111,12 @@ async def create_candidate(
             detail="Unauthorized",
         )
 
+    if "resolution" in proposal.model_dump():
+        raise HTTPException(
+            status_code=422,
+            detail="Ingested proposals cannot contain a resolution record",
+        )
+
     created = await save_candidate_to_supabase(proposal)
 
     if not created:
@@ -136,8 +141,6 @@ async def get_candidates(
     ] | None = Query(default=None),
     x_ingest_token: str | None = Header(default=None),
 ):
-    # Temporary protection for backend testing.
-    # Never expose this token in React.
     expected_token = os.getenv("CANDIDATE_INGEST_TOKEN")
 
     if not expected_token:
@@ -177,7 +180,6 @@ async def get_candidates(
         "limit": limit,
     }
 
-    # Optional filter; omitting it keeps the original "all candidates" result.
     if review_status:
         params["review_status"] = f"eq.{review_status}"
 
@@ -249,7 +251,6 @@ async def update_candidate_decision(
         "Prefer": "return=representation",
     }
 
-    # Update only candidates awaiting a decision.
     params = {
         "proposal_id": f"eq.{proposal_id}",
         "review_status": "eq.pending_review",

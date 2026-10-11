@@ -1,5 +1,3 @@
-// Sidebar navigation. Items without `available: true` are rendered as
-// disabled "Soon" entries until their feature is implemented.
 export const NAV_SECTIONS = [
   {
     label: "Capture",

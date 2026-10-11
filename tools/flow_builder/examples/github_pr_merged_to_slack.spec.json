@@ -1,0 +1,27 @@
+{
+  "spec_version": "1",
+  "template_type": "github_pr_merged_to_slack",
+  "name": "PR merged to Slack (generated)",
+  "description": "Notify the approved Slack channel when a pull request is merged in the approved repository.",
+  "trigger": {
+    "source": "github",
+    "event": "pull_request_merged",
+    "event_source_mode": "simulated"
+  },
+  "action": {
+    "tool": "slack",
+    "operation": "SLACK_SEND_MESSAGE"
+  },
+  "tools": ["SLACK_SEND_MESSAGE"],
+  "destination": {
+    "allowed_repository": "runtime:approved_destination.allowed_repository",
+    "slack_channel_id": "runtime:approved_destination.slack_channel_id"
+  },
+  "message": {
+    "include_fields": ["pull_request_title", "actor", "project"]
+  },
+  "approval_policy": {
+    "human_approval_required": true,
+    "activation_requires_verification": true
+  }
+}

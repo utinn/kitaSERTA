@@ -21,7 +21,6 @@ FLOW_ID = os.getenv("LANGFLOW_ANALYSIS_FLOW_ID")
 FILTER_ID = os.getenv("LANGFLOW_FREQUENCY_FILTER_ID")
 API_KEY = os.getenv("LANGFLOW_API_KEY")
 
-# Fields the frequency filter groups activity events by.
 DETECTION_GROUP_BY = ["tool", "action"]
 
 class AnalysisSettings(BaseModel):
@@ -108,7 +107,6 @@ def extract_candidates(result: dict) -> list[dict]:
 
     text = message.strip()
 
-    # Remove optional Markdown code fences.
     if text.startswith("```"):
         lines = text.splitlines()
 
@@ -203,9 +201,6 @@ async def run_analysis(settings: AnalysisSettings):
             detail=str(exc)
         ) from exc
 
-    # Snapshot the settings that produced each candidate inside its
-    # proposal JSON. Existing rows are never updated, so a re-analysis
-    # cannot change the snapshot of an already-saved candidate.
     detection_settings = {
         **settings.model_dump(),
         "group_by": DETECTION_GROUP_BY,
@@ -233,7 +228,6 @@ async def run_analysis(settings: AnalysisSettings):
     duplicate_ids = []
 
     for candidate in validated_candidates:
-        # Extra guard against AI-generated placeholders.
         if (
             not candidate.evidence_event_ids
             or not candidate.model_extra

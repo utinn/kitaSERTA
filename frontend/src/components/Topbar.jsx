@@ -1,7 +1,4 @@
 import Icon from "./Icon.jsx";
-import { API_BASE_URL } from "../api/activities.js";
-
-const API_HOST = API_BASE_URL.replace(/^https?:\/\//, "");
 
 export default function Topbar({ title, sidebarOpen, onMenuClick }) {
   return (
@@ -24,11 +21,6 @@ export default function Topbar({ title, sidebarOpen, onMenuClick }) {
           {title}
         </span>
       </nav>
-
-      <div className="topbar-meta" title="Backend API base URL">
-        <Icon name="server" size={14} />
-        <span className="mono">{API_HOST}</span>
-      </div>
     </header>
   );
 }

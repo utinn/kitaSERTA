@@ -3,7 +3,6 @@ import Icon from "./Icon.jsx";
 import { submitDecision } from "../api/candidates.js";
 import { asArray, humanize, normalizeStep } from "../utils/candidateFormat.js";
 
-// Tone per database-managed status value; unknown values render neutral.
 const TONES = {
   approved: "success",
   accepted: "success",
@@ -13,7 +12,6 @@ const TONES = {
   missing: "danger",
 };
 
-// Readable names for known trigger slugs; others fall back to humanize().
 const TRIGGER_LABELS = {
   GITHUB_PULL_REQUEST_MERGED: "GitHub pull request merges",
 };
@@ -52,8 +50,6 @@ export function StatusPill({ value }) {
   );
 }
 
-// Settings snapshot saved with the proposal when it was detected.
-// Older candidates have no snapshot and render no badges.
 export function DetectionBadges({ settings }) {
   if (!settings || typeof settings !== "object") return null;
   const { min_occurrences: minOccurrences, window_days: windowDays } = settings;
@@ -85,15 +81,6 @@ function DetailSection({ title, children }) {
   );
 }
 
-/**
- * Renders one record from GET /api/candidates.
- * `candidate.proposal` is the AI-generated proposal; `review_status`,
- * `validation_result` and `sop_status` at the top level are managed by the
- * database and take precedence over copies inside the proposal.
- *
- * Accept/Reject are enabled only while `review_status === "pending_review"`.
- * A decision records human review only; it never executes an automation.
- */
 export default function CandidateCard({ candidate, onDecisionSaved }) {
   const [expanded, setExpanded] = useState(false);
   const [confirming, setConfirming] = useState(null);
@@ -147,7 +134,6 @@ export default function CandidateCard({ candidate, onDecisionSaved }) {
   }
 
   async function confirmDecision() {
-    // Guard against double submission before React re-renders.
     if (submittingRef.current || !confirming) return;
     submittingRef.current = true;
     setSubmitting(true);
@@ -159,7 +145,6 @@ export default function CandidateCard({ candidate, onDecisionSaved }) {
       onDecisionSaved?.(candidate, result);
     } catch (error) {
       setDecisionError(error.message);
-      // Not found / already reviewed: retrying cannot succeed.
       setRetryable(![404, 409].includes(error.status));
     } finally {
       submittingRef.current = false;

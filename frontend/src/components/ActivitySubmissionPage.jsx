@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import FormField from "./FormField.jsx";
 import Icon from "./Icon.jsx";
-import PayloadPreview from "./PayloadPreview.jsx";
 import PipelineCard from "./PipelineCard.jsx";
+import RippleButton from "./RippleButton.jsx";
 import SubmissionResult from "./SubmissionResult.jsx";
 import { API_BASE_URL, submitActivity } from "../api/activities.js";
 
@@ -18,7 +18,6 @@ export default function ActivitySubmissionPage() {
   const [employeeId, setEmployeeId] = useState("");
   const [title, setTitle] = useState("");
   const [repository, setRepository] = useState("");
-  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [errors, setErrors] = useState({});
@@ -39,7 +38,6 @@ export default function ActivitySubmissionPage() {
   function handleFieldChange(key, setter) {
     return (event) => {
       setter(event.target.value);
-      setPreview(null);
       if (errors[key]) {
         setErrors((current) => ({ ...current, [key]: undefined }));
       }
@@ -62,7 +60,6 @@ export default function ActivitySubmissionPage() {
     }
 
     setErrors({});
-    setPreview(activity);
     setLoading(true);
     setResult(null);
 
@@ -91,7 +88,6 @@ export default function ActivitySubmissionPage() {
     setEmployeeId("");
     setTitle("");
     setRepository("");
-    setPreview(null);
     setResult(null);
     setErrors({});
     inputRefs.employee_id.current?.focus();
@@ -101,23 +97,32 @@ export default function ActivitySubmissionPage() {
 
   return (
     <>
-      <div className="page-header">
+      <div className="page-header reveal" style={{ "--reveal-index": 0 }}>
         <p className="page-eyebrow">Creator Dashboard</p>
         <h1 className="page-title">Submit activity</h1>
         <p className="page-description">
-          Record a digital activity so kitaSERTA can analyze it for
-          automation opportunities.
+          Record a digital work activity. It is saved to your activity history,
+          where kitaSERTA can later analyze it for automation opportunities.
         </p>
       </div>
 
       <div className="page-grid">
-        <section className="card" aria-labelledby="form-title">
+        <section
+          className="card reveal"
+          style={{ "--reveal-index": 1 }}
+          aria-labelledby="form-title"
+        >
           <div className="card-header">
-            <div>
-              <h2 className="card-title" id="form-title">
-                Activity details
-              </h2>
-              <p className="card-description">All fields are required.</p>
+            <div className="card-heading-icon">
+              <span className="card-icon" aria-hidden="true">
+                <Icon name="fileText" size={16} />
+              </span>
+              <div>
+                <h2 className="card-title" id="form-title">
+                  Activity details
+                </h2>
+                <p className="card-description">All fields are required.</p>
+              </div>
             </div>
           </div>
 
@@ -128,49 +133,51 @@ export default function ActivitySubmissionPage() {
             aria-busy={loading}
           >
             <fieldset className="form-fields" disabled={loading}>
-              <FormField
-                id="employee"
-                label="Employee ID"
-                hint="Identifier of the person who performed the activity."
-                error={errors.employee_id}
-              >
-                {(aria) => (
-                  <input
-                    ref={inputRefs.employee_id}
-                    id="employee"
-                    className="input"
-                    value={employeeId}
-                    onChange={handleFieldChange("employee_id", setEmployeeId)}
-                    placeholder="dev-001"
-                    autoComplete="off"
-                    spellCheck={false}
-                    required
-                    {...aria}
-                  />
-                )}
-              </FormField>
-
-              <FormField
-                id="activity"
-                label="Activity type"
-                hint="Only GitHub pull request merges are supported for now."
-              >
-                {(aria) => (
-                  <div className="select-wrapper">
-                    <select
-                      id="activity"
-                      className="input select"
-                      value={ACTIVITY_TYPE}
-                      disabled
+              <div className="form-row">
+                <FormField
+                  id="employee"
+                  label="Employee ID"
+                  hint="Identifier of the person who performed the activity."
+                  error={errors.employee_id}
+                >
+                  {(aria) => (
+                    <input
+                      ref={inputRefs.employee_id}
+                      id="employee"
+                      className="input"
+                      value={employeeId}
+                      onChange={handleFieldChange("employee_id", setEmployeeId)}
+                      placeholder="dev-001"
+                      autoComplete="off"
+                      spellCheck={false}
+                      required
                       {...aria}
-                    >
-                      <option value={ACTIVITY_TYPE}>
-                        GitHub — Pull Request Merged
-                      </option>
-                    </select>
-                  </div>
-                )}
-              </FormField>
+                    />
+                  )}
+                </FormField>
+
+                <FormField
+                  id="activity"
+                  label="Activity type"
+                  hint="Only GitHub pull request merges are supported for now."
+                >
+                  {(aria) => (
+                    <div className="select-wrapper">
+                      <select
+                        id="activity"
+                        className="input select"
+                        value={ACTIVITY_TYPE}
+                        disabled
+                        {...aria}
+                      >
+                        <option value={ACTIVITY_TYPE}>
+                          GitHub — Pull Request Merged
+                        </option>
+                      </select>
+                    </div>
+                  )}
+                </FormField>
+              </div>
 
               <FormField
                 id="title"
@@ -216,7 +223,7 @@ export default function ActivitySubmissionPage() {
             </fieldset>
 
             <div className="form-actions">
-              <button
+              <RippleButton
                 type="button"
                 className="button button-ghost"
                 onClick={handleReset}
@@ -224,28 +231,27 @@ export default function ActivitySubmissionPage() {
               >
                 <Icon name="reset" size={14} />
                 Clear
-              </button>
-              <button
+              </RippleButton>
+              <RippleButton
                 type="submit"
                 className="button button-primary"
                 disabled={loading}
               >
                 {loading && <span className="spinner" aria-hidden="true" />}
                 {loading ? "Submitting…" : "Submit activity"}
-              </button>
+              </RippleButton>
             </div>
           </form>
 
           {result && (
-            <div className="card-section">
+            <div className="card-section result-enter">
               <SubmissionResult result={result} />
             </div>
           )}
         </section>
 
         <div className="page-aside">
-          <PayloadPreview payload={preview ?? activity} submitted={!!preview} />
-          <PipelineCard />
+          <PipelineCard style={{ "--reveal-index": 2 }} />
         </div>
       </div>
     </>

@@ -11,10 +11,16 @@ from typing import Any
 import httpx
 from dotenv import load_dotenv
 
-from fastapi import HTTPException, FastAPI, Query
+from fastapi import BackgroundTasks, HTTPException, FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from analysis_api import router as analysis_router
+from automation_config_api import router as automation_config_router
+from connection_verification_api import router as connection_verification_router
+from automation_activation_api import router as automation_activation_router
+from execution_history_api import router as execution_history_router
+from destination_resolution_api import router as destination_resolution_router
+from automation_execution import dispatch_new_event
 
 load_dotenv()
 
@@ -62,6 +68,11 @@ app = FastAPI(
 
 app.include_router(analysis_router)
 app.include_router(candidates_router)
+app.include_router(automation_config_router)
+app.include_router(connection_verification_router)
+app.include_router(automation_activation_router)
+app.include_router(execution_history_router)
+app.include_router(destination_resolution_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -84,12 +95,10 @@ def health_check():
 
 
 @app.post("/api/activities", status_code=202)
-async def submit_activity(activity: ActivityInput):
+async def submit_activity(activity: ActivityInput, background_tasks: BackgroundTasks):
 
-    # Step 1: Transform validated input
     event = transform_activity(activity)
 
-    # Step 2: Forward event to Langflow
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
@@ -120,7 +129,8 @@ async def submit_activity(activity: ActivityInput):
             detail="Cannot connect to Langflow"
         )
 
-    # Step 3: Return response
+    background_tasks.add_task(dispatch_new_event, event["metadata"]["event_id"])
+
     return {
         "status": "accepted",
         "event_id": event["metadata"]["event_id"],
@@ -132,17 +142,14 @@ async def submit_activity(activity: ActivityInput):
 async def get_activities(
     limit: int = Query(default=20, ge=1, le=100)
 ):
-    # 1. Supabase REST API endpoint
     url = f"{SUPABASE_URL}/rest/v1/activity_events"
 
-    # 2. Authentication headers
     headers = {
         "apikey": SUPABASE_ANON_KEY,
         "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
         "Accept": "application/json"
     }
 
-    # 3. Query parameters
     params = {
         "select": (
             "id,employee_id,tool,action,object,"
@@ -153,7 +160,6 @@ async def get_activities(
         "limit": limit
     }
 
-    # 4. Request data from Supabase
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             response = await client.get(
@@ -196,7 +202,6 @@ async def get_activities(
             detail="Unexpected Supabase response format"
         )
 
-    # 5. Return JSON to React / Swagger
     return {
         "total": len(activities),
         "data": activities

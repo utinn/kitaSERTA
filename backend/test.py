@@ -11,7 +11,6 @@ if not os.getenv("COMPOSIO_API_KEY"):
 
 composio = Composio()
 
-# Fill locally from the ACTIVE Slack Connected Account
 user_id = "pg-test-cd1a5215-b12b-41c6-90fb-f944fa9d828e"
 slack_account_id = "ca_iZ_BXAhPV7Al"
 
@@ -20,7 +19,7 @@ session = composio.sessions.create(
     toolkits=["slack"],
     tools={
         "slack": {
-            
+
             "enable": ["SLACK_SEND_MESSAGE"]
         }
     },

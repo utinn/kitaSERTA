@@ -1,8 +1,4 @@
-/* ------------------------------------------------------------------
-   Design tokens
-   ------------------------------------------------------------------ */
 :root {
-  /* Neutral palette */
   --gray-0: #ffffff;
   --gray-50: #fafafa;
   --gray-100: #f4f4f5;
@@ -17,7 +13,6 @@
   --gray-900: #18181b;
   --gray-950: #09090b;
 
-  /* Semantic colors */
   --color-bg: var(--gray-50);
   --color-surface: var(--gray-0);
   --color-surface-muted: var(--gray-100);
@@ -38,7 +33,6 @@
   --color-danger-bg: #fef2f2;
   --color-danger-border: #fecaca;
 
-  /* Typography */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono",
@@ -51,7 +45,6 @@
   --text-lg: 1.125rem;
   --text-2xl: 1.625rem;
 
-  /* Spacing (4px grid) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -62,7 +55,6 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Shape & depth */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -71,7 +63,6 @@
   --shadow-lg: 0 10px 30px rgb(9 9 11 / 0.12);
   --ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-focus);
 
-  /* Layout */
   --sidebar-width: 248px;
   --topbar-height: 56px;
   --content-max: 1120px;
@@ -89,9 +80,6 @@
   text-rendering: optimizeLegibility;
 }
 
-/* ------------------------------------------------------------------
-   Base
-   ------------------------------------------------------------------ */
 *,
 *::before,
 *::after {

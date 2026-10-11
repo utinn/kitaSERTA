@@ -3,7 +3,6 @@ import FormField from "./FormField.jsx";
 import Icon from "./Icon.jsx";
 import { runAnalysis } from "../api/analysis.js";
 
-// Ranges mirror AnalysisSettings in backend/analysis_api.py.
 const FIELDS = {
   min_occurrences: { label: "Min occurrences", min: 1, max: 100 },
   window_days: { label: "Window days", min: 1, max: 90 },
@@ -49,10 +48,6 @@ function describeResult(data) {
   };
 }
 
-/**
- * Runs POST /api/analysis/run with user-chosen detection settings.
- * Calls `onAnalyzed` after a successful run so the parent can refresh.
- */
 export default function DetectionSettings({ onAnalyzed }) {
   const [values, setValues] = useState(DEFAULTS);
   const [errors, setErrors] = useState({});

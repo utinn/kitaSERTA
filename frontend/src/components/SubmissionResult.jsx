@@ -33,7 +33,7 @@ export default function SubmissionResult({ result }) {
       <div className="alert alert-success" role="status">
         <Icon name="checkCircle" size={18} className="alert-icon" />
         <div className="alert-body">
-          <p className="alert-title">Request accepted by Langflow</p>
+          <p className="alert-title">Activity submitted</p>
           {result.message && <p className="alert-text">{result.message}.</p>}
 
           <div className="event-id">
